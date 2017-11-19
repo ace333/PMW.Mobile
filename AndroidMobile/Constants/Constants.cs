@@ -15,6 +15,7 @@ namespace AndroidMobile.Constants
     public static class StaticValues
     {
         public static int MaxValue = 5;
+        public static string DeviceAddress = "EE:8D:AD:5B:2B:E3";
     }
 
     public static class APIConstant

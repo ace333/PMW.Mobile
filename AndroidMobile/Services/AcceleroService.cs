@@ -42,24 +42,24 @@ namespace AndroidMobile.Services
 
         private void _acceleroValueUpdating(object state)
         {
-            if(_acceleroX.Count >= 5 && _acceleroY.Count >= 5 && _acceleroZ.Count >= 5)
+            if(_acceleroX.Count >= StaticValues.MaxValue && _acceleroY.Count >= StaticValues.MaxValue && _acceleroZ.Count >= StaticValues.MaxValue)
             {
-                var xArr = _acceleroX.GetRange(0, 5).ToArray();
-                var yArr = _acceleroY.GetRange(0, 5).ToArray();
-                var zArr = _acceleroZ.GetRange(0, 5).ToArray();
+                var xArr = _acceleroX.GetRange(0, StaticValues.MaxValue).ToArray();
+                var yArr = _acceleroY.GetRange(0, StaticValues.MaxValue).ToArray();
+                var zArr = _acceleroZ.GetRange(0, StaticValues.MaxValue).ToArray();
 
                 var finalArray = new int[xArr.Length + yArr.Length + zArr.Length];
                 xArr.CopyTo(finalArray, 0);
-                yArr.CopyTo(finalArray, 5);
-                zArr.CopyTo(finalArray, 10);
+                yArr.CopyTo(finalArray, StaticValues.MaxValue);
+                zArr.CopyTo(finalArray, StaticValues.MaxValue * 2);
 
                 SendValues(finalArray);
 
                 Log.Debug("ACCELERO DEBUG : ", finalArray.Length.ToString());
 
-                _acceleroX.RemoveRange(0, 5);
-                _acceleroY.RemoveRange(0, 5);
-                _acceleroZ.RemoveRange(0, 5);
+                _acceleroX.RemoveRange(0, StaticValues.MaxValue);
+                _acceleroY.RemoveRange(0, StaticValues.MaxValue);
+                _acceleroZ.RemoveRange(0, StaticValues.MaxValue);
             }
         }
 

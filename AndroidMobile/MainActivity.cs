@@ -12,10 +12,11 @@ using Android.Content;
 using AndroidMobile.Services;
 using System.Threading;
 using System.Threading.Tasks;
+using AndroidMobile.Constants;
 
 namespace AndroidMobile
 {
-    [Activity(Label = "AndroidMobile", MainLauncher = true)]
+    [Activity(Label = "Patient Monitoring Workflow", MainLauncher = true)]
     public class MainActivity : Activity
     {
         private Plugin.BLE.Abstractions.Contracts.IAdapter _bleAdapter;
@@ -69,16 +70,14 @@ namespace AndroidMobile
                             IList<ICharacteristic> accereloChar = await services[2].GetCharacteristicsAsync();
                             IList<ICharacteristic> heartChar = await services[3].GetCharacteristicsAsync();
 
-                            heartChar[0].ValueUpdated += heartValue_updated;
-                            await heartChar[0].StartUpdatesAsync();
-
+                            heartChar[0].ValueUpdated += heartValue_updated;                            
                             accereloChar[0].ValueUpdated += acceleroX_updated;
-                            await accereloChar[0].StartUpdatesAsync();
-
                             accereloChar[1].ValueUpdated += acceleroY_updated;
-                            await accereloChar[1].StartUpdatesAsync();
-
                             accereloChar[2].ValueUpdated += acceleroZ_updated;
+
+                            await heartChar[0].StartUpdatesAsync();
+                            await accereloChar[0].StartUpdatesAsync();
+                            await accereloChar[1].StartUpdatesAsync();
                             await accereloChar[2].StartUpdatesAsync();
 
                         }
@@ -157,7 +156,7 @@ namespace AndroidMobile
             Toast.MakeText(this, _currDevice.Name + " - discovered!", ToastLength.Long).Show();
             BluetoothDevice dev = _currDevice.NativeDevice as BluetoothDevice;
 
-            if (dev.Address == "EE:8D:AD:5B:2B:E3")
+            if (dev.Address == StaticValues.DeviceAddress)
                 ConnectToPMDDeviceAsync();
         }
 

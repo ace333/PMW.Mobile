@@ -38,14 +38,14 @@ namespace AndroidMobile.Services
 
         private void _heartValueUpdating(object state)
         {
-            if(_heartValues.Count >= 5)
+            if(_heartValues.Count >= StaticValues.MaxValue)
             {
-                var array = _heartValues.GetRange(0, 5).ToArray();
+                var array = _heartValues.GetRange(0, StaticValues.MaxValue).ToArray();
 
                 SendValues(array);
 
                 Log.Debug("HEART DEBUG : ", array.Length.ToString());
-                _heartValues.RemoveRange(0, 5);
+                _heartValues.RemoveRange(0, StaticValues.MaxValue);
             }
         }
 
