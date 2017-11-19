@@ -5,39 +5,51 @@
     android:layout_height="match_parent"
     android:minWidth="25px"
     android:minHeight="25px">
+    <TextView
+        android:text="Welcome to PMW Mobile App"
+        android:layout_width="273.0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textSize="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:textAlignment="center"
+        android:id="@+id/infoText" />
     <Button
-        android:text="Scan"
-        android:layout_width="match_parent"
-        android:layout_height="65dp"
+        android:text="Connect To Device and Start Transmitting Data"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="320.5dp"
+        android:layout_height="91.5dp"
         android:id="@+id/scanButton"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp" />
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="5dp" />
+    <TextView
+        android:text="Is Connected ?"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="95.5dp"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:id="@+id/isConnectedText"
+        android:layout_marginTop="50dp" />
     <Button
-        android:text="Connect"
-        android:layout_width="match_parent"
-        android:layout_height="65dp"
-        android:id="@+id/connectButton"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp" />
+        android:layout_width="120.0dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="wrap_content"
+        android:id="@+id/connectedButton"
+        android:layout_marginTop="25dp" />
+    <TextView
+        android:text="Is Transmitting ?"
+        android:layout_width="105.0dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:id="@+id/isTransmittingText"
+        android:layout_marginTop="25dp" />
     <Button
-        android:text="Disconnect"
-        android:layout_width="match_parent"
-        android:layout_height="65dp"
-        android:id="@+id/disconnectButton"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp" />
-    <Button
-        android:text="Button"
-        android:layout_width="wrap_content"
-        android:layout_height="65dp"
-        android:id="@+id/startHeartServiceButton"
-        android:layout_marginTop="15dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"/>
+        android:layout_width="120.0dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="wrap_content"
+        android:id="@+id/transmittingButton"
+        android:layout_marginTop="25dp" />
 </LinearLayout>

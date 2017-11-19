@@ -44,17 +44,23 @@ namespace AndroidMobile
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f040001
-			public const int connectButton = 2130968577;
-			
-			// aapt resource value: 0x7f040002
-			public const int disconnectButton = 2130968578;
+			// aapt resource value: 0x7f040003
+			public const int connectedButton = 2130968579;
 			
 			// aapt resource value: 0x7f040000
-			public const int scanButton = 2130968576;
+			public const int infoText = 2130968576;
 			
-			// aapt resource value: 0x7f040003
-			public const int startHeartServiceButton = 2130968579;
+			// aapt resource value: 0x7f040002
+			public const int isConnectedText = 2130968578;
+			
+			// aapt resource value: 0x7f040004
+			public const int isTransmittingText = 2130968580;
+			
+			// aapt resource value: 0x7f040001
+			public const int scanButton = 2130968577;
+			
+			// aapt resource value: 0x7f040005
+			public const int transmittingButton = 2130968581;
 			
 			static Id()
 			{

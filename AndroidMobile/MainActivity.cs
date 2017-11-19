@@ -26,6 +26,9 @@ namespace AndroidMobile
         private Intent _heartService;
         private Intent _acceleroService;
 
+        private Button _isConnectedButton;
+        private Button _isTrasmittinButton;
+
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -70,15 +73,19 @@ namespace AndroidMobile
                             IList<ICharacteristic> accereloChar = await services[2].GetCharacteristicsAsync();
                             IList<ICharacteristic> heartChar = await services[3].GetCharacteristicsAsync();
 
-                            heartChar[0].ValueUpdated += heartValue_updated;                            
-                            accereloChar[0].ValueUpdated += acceleroX_updated;
-                            accereloChar[1].ValueUpdated += acceleroY_updated;
-                            accereloChar[2].ValueUpdated += acceleroZ_updated;
-
+                            heartChar[0].ValueUpdated += heartValue_updated;
                             await heartChar[0].StartUpdatesAsync();
+
+                            accereloChar[0].ValueUpdated += acceleroX_updated;
                             await accereloChar[0].StartUpdatesAsync();
+
+                            accereloChar[1].ValueUpdated += acceleroY_updated;
                             await accereloChar[1].StartUpdatesAsync();
+
+                            accereloChar[2].ValueUpdated += acceleroZ_updated;
                             await accereloChar[2].StartUpdatesAsync();
+
+                            _isTrasmittinButton.SetBackgroundColor(Android.Graphics.Color.LawnGreen);
 
                         }
                     }
@@ -91,25 +98,14 @@ namespace AndroidMobile
 
         private void InitializeButtons()
         {
-            Button disconnetButton = FindViewById<Button>(Resource.Id.disconnectButton);
             Button scanButton = FindViewById<Button>(Resource.Id.scanButton);
-            Button connButton = FindViewById<Button>(Resource.Id.connectButton);
-            Button startHeartServiceButton = FindViewById<Button>(Resource.Id.startHeartServiceButton);
 
-            disconnetButton.Click += disconnect_delegate;
-            scanButton.Click += bleScan;
-            connButton.Click += bleconnectAsync;
-            startHeartServiceButton.Click += StartHeartServiceButton_Click;
-        }
+            _isConnectedButton = FindViewById<Button>(Resource.Id.connectedButton);
+            _isConnectedButton.SetBackgroundColor(Android.Graphics.Color.PaleVioletRed);
+            _isTrasmittinButton = FindViewById<Button>(Resource.Id.transmittingButton);
+            _isTrasmittinButton.SetBackgroundColor(Android.Graphics.Color.PaleVioletRed);
 
-        private void StartHeartServiceButton_Click(object sender, EventArgs e)
-        {
-            StartService(_heartService);
-        }
-
-        private async void bleconnectAsync(object sender, EventArgs e)
-        {
-            //
+            scanButton.Click += bleScan;            
         }
 
         private void acceleroZ_updated(object sender, CharacteristicUpdatedEventArgs e)
@@ -141,14 +137,6 @@ namespace AndroidMobile
             _bleAdapter.StartScanningForDevicesAsync();
         }
 
-        private void disconnect_delegate(object sender, EventArgs e)
-        {
-            _bleAdapter.DisconnectDeviceAsync(_currDevice);
-
-            StopService(_heartService);
-            StopService(_acceleroService);
-        }
-
         private void _bleAdapter_DeviceDiscovered(object sender, DeviceEventArgs e)
         {
             _currDevice = e.Device;
@@ -178,6 +166,7 @@ namespace AndroidMobile
                 try
                 {
                     await _bleAdapter.ConnectToDeviceAsync(_currDevice);
+                    _isConnectedButton.SetBackgroundColor(Android.Graphics.Color.LawnGreen);
 
                     StopScanningForDevice();
                     Toast.MakeText(this, "Connected to " + _currDevice.Name + "!", ToastLength.Short).Show();
