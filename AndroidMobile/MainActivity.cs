@@ -22,19 +22,9 @@ namespace AndroidMobile
         private IDevice _currDevice;
         private IBluetoothLE _bluetooth;
 
-        private bool isConnected;
+        private Intent _heartService;
+        private Intent _acceleroService;
 
-        private List<byte[]> acceleroBytes = new List<byte[]>();
-        private List<byte[]> heartBytes = new List<byte[]>();
-
-        public static List<int> heartValues = new List<int>();
-        public static int _heartBuff = 0;
-        private List<int> xAcceleroValues = new List<int>();
-        private List<int> yAcceleroValues = new List<int>();
-        private List<int> zAcceleroValues = new List<int>();
-
-        private IList<ICharacteristic> accereloChar = new List<ICharacteristic>();
-        private IList<ICharacteristic> heartChar = new List<ICharacteristic>();
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -49,35 +39,23 @@ namespace AndroidMobile
             InitializeButtons();
 
             _bleAdapter.DeviceDiscovered += _bleAdapter_DeviceDiscovered;
+            _bleAdapter.DeviceConnected += _bleAdapter_DeviceConnected;
+
+            _heartService = new Intent(this, typeof(HeartService));
+            _acceleroService = new Intent(this, typeof(AcceleroService));
         }
 
-        private void InitializeButtons()
+        private void _bleAdapter_DeviceConnected(object sender, DeviceEventArgs e)
         {
-            Button disconnetButton = FindViewById<Button>(Resource.Id.disconnectButton);
-            Button scanButton = FindViewById<Button>(Resource.Id.scanButton);
-            Button connButton = FindViewById<Button>(Resource.Id.connectButton);
-            Button startHeartServiceButton = FindViewById<Button>(Resource.Id.startHeartServiceButton);
+            StartService(_heartService);
+            StartService(_acceleroService);
 
-            disconnetButton.Click += disconnect_delegate;
-            scanButton.Click += bleScan;
-            connButton.Click += bleconnectAsync;
-            startHeartServiceButton.Click += StartHeartServiceButton_Click;
+            StartCharacteristics();
         }
 
-        private void StartHeartServiceButton_Click(object sender, EventArgs e)
+        private async void StartCharacteristics()
         {
-            StartHeartService();
-        }
-
-        private void StartHeartService()
-        {
-            Intent heartService = new Intent(this, typeof(HeartService));
-            StartService(heartService);
-        }
-
-        private async void bleconnectAsync(object sender, EventArgs e)
-        {
-            string errorstr = "";
+            string errorstr;
             if (_bluetooth.IsAvailable)
                 if (_bluetooth.IsOn)
                 {
@@ -88,8 +66,8 @@ namespace AndroidMobile
                         {
                             var services = await _currDevice.GetServicesAsync();
 
-                            accereloChar = await services[2].GetCharacteristicsAsync();
-                            heartChar = await services[3].GetCharacteristicsAsync();
+                            IList<ICharacteristic> accereloChar = await services[2].GetCharacteristicsAsync();
+                            IList<ICharacteristic> heartChar = await services[3].GetCharacteristicsAsync();
 
                             heartChar[0].ValueUpdated += heartValue_updated;
                             await heartChar[0].StartUpdatesAsync();
@@ -112,29 +90,51 @@ namespace AndroidMobile
                 }
         }
 
+        private void InitializeButtons()
+        {
+            Button disconnetButton = FindViewById<Button>(Resource.Id.disconnectButton);
+            Button scanButton = FindViewById<Button>(Resource.Id.scanButton);
+            Button connButton = FindViewById<Button>(Resource.Id.connectButton);
+            Button startHeartServiceButton = FindViewById<Button>(Resource.Id.startHeartServiceButton);
+
+            disconnetButton.Click += disconnect_delegate;
+            scanButton.Click += bleScan;
+            connButton.Click += bleconnectAsync;
+            startHeartServiceButton.Click += StartHeartServiceButton_Click;
+        }
+
+        private void StartHeartServiceButton_Click(object sender, EventArgs e)
+        {
+            StartService(_heartService);
+        }
+
+        private async void bleconnectAsync(object sender, EventArgs e)
+        {
+            //
+        }
+
         private void acceleroZ_updated(object sender, CharacteristicUpdatedEventArgs e)
         {
             var value = e.Characteristic.Value[0];
-            zAcceleroValues.Add(value);
+            AcceleroService._acceleroZ.Add(value);
         }
 
         private void acceleroY_updated(object sender, CharacteristicUpdatedEventArgs e)
         {
             var value = e.Characteristic.Value[0];
-            yAcceleroValues.Add(value);
+            AcceleroService._acceleroY.Add(value);
         }
 
         private void acceleroX_updated(object sender, CharacteristicUpdatedEventArgs e)
         {
             var value = e.Characteristic.Value[0];
-            xAcceleroValues.Add(value);
+            AcceleroService._acceleroX.Add(value);
         }
 
         private void heartValue_updated(object sender, CharacteristicUpdatedEventArgs e)
         {
             var value = e.Characteristic.Value[0];
-            heartValues.Add(value);
-            _heartBuff++;
+            HeartService._heartValues.Add(value);
         }
 
         private void bleScan(object sender, EventArgs e)
@@ -145,6 +145,9 @@ namespace AndroidMobile
         private void disconnect_delegate(object sender, EventArgs e)
         {
             _bleAdapter.DisconnectDeviceAsync(_currDevice);
+
+            StopService(_heartService);
+            StopService(_acceleroService);
         }
 
         private void _bleAdapter_DeviceDiscovered(object sender, DeviceEventArgs e)

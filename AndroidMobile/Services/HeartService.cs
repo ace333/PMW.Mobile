@@ -11,33 +11,41 @@ using Android.Views;
 using Android.Widget;
 using Android.Util;
 using System.Threading;
+using AndroidMobile.Constants;
+using AndroidMobile.Helpers;
 
 namespace AndroidMobile.Services
 {
     [Service]
     public class HeartService : Service
     {
-        private List<int> _heartValues;
+        public static List<int> _heartValues;
         private bool _isStarted;
         
         Timer _timer;
-        Handler _handler;
-        private Action _action;
 
         public override void OnCreate()
         {
             base.OnCreate();
-            _heartValues = MainActivity.heartValues;
+            _heartValues = new List<int>();
+        }
+
+        private async void SendValues(int[] values)
+        {
+            bool result = await JSONApiHelper.DoPostRequestAsync(APIConstant.HeartRateAddress, values);
+            Log.Debug("ACCELERO POST REQUEST : ", result.ToString());
         }
 
         private void _heartValueUpdating(object state)
         {
-            if(MainActivity._heartBuff >= 5)
+            if(_heartValues.Count >= 5)
             {
-                var array = _heartValues.ToArray();
+                var array = _heartValues.GetRange(0, 5).ToArray();
+
+                SendValues(array);
+
                 Log.Debug("HEART DEBUG : ", array.Length.ToString());
                 _heartValues.RemoveRange(0, 5);
-                MainActivity._heartBuff = 0;
             }
         }
 
@@ -51,8 +59,7 @@ namespace AndroidMobile.Services
         {
             if(!_isStarted)
             {
-                //_handler.Post(_action);
-                _timer = new Timer(_heartValueUpdating, DateTime.Now, 0, 50);
+                _timer = new Timer(_heartValueUpdating, DateTime.Now, 0, 100);
                 _isStarted = true;
             }
 
