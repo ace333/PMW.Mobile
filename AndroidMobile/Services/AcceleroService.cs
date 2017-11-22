@@ -22,6 +22,13 @@ namespace AndroidMobile.Services
         public static List<int> _acceleroX;
         public static List<int> _acceleroY;
         public static List<int> _acceleroZ;
+
+        public static int _acceleroIncrement_X;
+        public static int _acceleroIncrement_Y;
+        public static int _acceleroIncrement_Z;
+
+        private static int _actualLength;
+
         private bool _isStarted;
 
         Timer _timer;
@@ -34,32 +41,35 @@ namespace AndroidMobile.Services
             _acceleroZ = new List<int>();
         }
 
-        private async void SendValues(int[] values)
-        {
-            bool result = await JSONApiHelper.DoPostRequestAsync(APIConstant.AcceleroAddress, values);
-            Log.Debug("ACCELERO POST REQUEST : ", result.ToString());
-        }
-
         private void _acceleroValueUpdating(object state)
         {
-            if(_acceleroX.Count >= StaticValues.MaxValue && _acceleroY.Count >= StaticValues.MaxValue && _acceleroZ.Count >= StaticValues.MaxValue)
+            if(_acceleroIncrement_X >= StaticValues.MaxValue && _acceleroIncrement_Y >= StaticValues.MaxValue && _acceleroIncrement_Z >= StaticValues.MaxValue)
             {
-                var xArr = _acceleroX.GetRange(0, StaticValues.MaxValue).ToArray();
-                var yArr = _acceleroY.GetRange(0, StaticValues.MaxValue).ToArray();
-                var zArr = _acceleroZ.GetRange(0, StaticValues.MaxValue).ToArray();
+                var xArr = _acceleroX.GetRange(_actualLength, StaticValues.MaxValue).ToArray();
+                var yArr = _acceleroY.GetRange(_actualLength, StaticValues.MaxValue).ToArray();
+                var zArr = _acceleroZ.GetRange(_actualLength, StaticValues.MaxValue).ToArray();
 
                 var finalArray = new int[xArr.Length + yArr.Length + zArr.Length];
                 xArr.CopyTo(finalArray, 0);
                 yArr.CopyTo(finalArray, StaticValues.MaxValue);
                 zArr.CopyTo(finalArray, StaticValues.MaxValue * 2);
 
-                SendValues(finalArray);
-
                 Log.Debug("ACCELERO DEBUG : ", finalArray.Length.ToString());
+                
+                if(_actualLength == 1000)
+                {
+                    _acceleroX.RemoveRange(0, StaticValues.ClearValue);
+                    _acceleroY.RemoveRange(0, StaticValues.ClearValue);
+                    _acceleroZ.RemoveRange(0, StaticValues.ClearValue);
+                }
 
-                _acceleroX.RemoveRange(0, StaticValues.MaxValue);
-                _acceleroY.RemoveRange(0, StaticValues.MaxValue);
-                _acceleroZ.RemoveRange(0, StaticValues.MaxValue);
+                _acceleroIncrement_X = 0;
+                _acceleroIncrement_Y = 0;
+                _acceleroIncrement_Z = 0;
+
+                _actualLength += StaticValues.MaxValue;
+
+                JSONApiHelper.DoPostRequestAsync(APIConstant.AcceleroAddress, finalArray);
             }
         }
 

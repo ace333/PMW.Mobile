@@ -18,7 +18,7 @@ namespace AndroidMobile.Helpers
 {
     public static class JSONApiHelper
     {
-        public async static Task<bool> DoPostRequestAsync(string measurementPath, int[] values)
+        public async static void DoPostRequestAsync(string measurementPath, int[] values)
         {
             using (var client = new HttpClient())
             {
@@ -27,8 +27,7 @@ namespace AndroidMobile.Helpers
                 var json = JsonConvert.SerializeObject(values);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var result = await client.PostAsync(uri, content);
-                return result.IsSuccessStatusCode;
+                HttpResponseMessage result = await client.PostAsync(uri, content);
             }
         }
 

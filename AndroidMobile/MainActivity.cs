@@ -43,19 +43,11 @@ namespace AndroidMobile
             InitializeButtons();
 
             _bleAdapter.DeviceDiscovered += _bleAdapter_DeviceDiscovered;
-            _bleAdapter.DeviceConnected += _bleAdapter_DeviceConnected;
 
             _heartService = new Intent(this, typeof(HeartService));
             _acceleroService = new Intent(this, typeof(AcceleroService));
         }
 
-        private void _bleAdapter_DeviceConnected(object sender, DeviceEventArgs e)
-        {
-            StartService(_heartService);
-            StartService(_acceleroService);
-
-            StartCharacteristics();
-        }
 
         private async void StartCharacteristics()
         {
@@ -99,37 +91,57 @@ namespace AndroidMobile
         private void InitializeButtons()
         {
             Button scanButton = FindViewById<Button>(Resource.Id.scanButton);
+            Button transmitButton = FindViewById<Button>(Resource.Id.trasmitData);
+
+            scanButton.SetTextColor(Android.Graphics.Color.White);
+            transmitButton.SetTextColor(Android.Graphics.Color.White);
+            transmitButton.Enabled = false;
 
             _isConnectedButton = FindViewById<Button>(Resource.Id.connectedButton);
             _isConnectedButton.SetBackgroundColor(Android.Graphics.Color.PaleVioletRed);
             _isTrasmittinButton = FindViewById<Button>(Resource.Id.transmittingButton);
             _isTrasmittinButton.SetBackgroundColor(Android.Graphics.Color.PaleVioletRed);
 
-            scanButton.Click += bleScan;            
+            scanButton.Click += bleScan;
+            transmitButton.Click += trasmitData;
+        }
+
+        private void trasmitData(object sender, EventArgs e)
+        {
+            _isTrasmittinButton.SetBackgroundColor(Android.Graphics.Color.LawnGreen);
+
+            StartService(_heartService);
+            StartService(_acceleroService);
+
+            StartCharacteristics();
         }
 
         private void acceleroZ_updated(object sender, CharacteristicUpdatedEventArgs e)
         {
             var value = e.Characteristic.Value[0];
             AcceleroService._acceleroZ.Add(value);
+            AcceleroService._acceleroIncrement_Z++;
         }
 
         private void acceleroY_updated(object sender, CharacteristicUpdatedEventArgs e)
         {
             var value = e.Characteristic.Value[0];
             AcceleroService._acceleroY.Add(value);
+            AcceleroService._acceleroIncrement_Y++;
         }
 
         private void acceleroX_updated(object sender, CharacteristicUpdatedEventArgs e)
         {
             var value = e.Characteristic.Value[0];
             AcceleroService._acceleroX.Add(value);
+            AcceleroService._acceleroIncrement_X++;
         }
 
         private void heartValue_updated(object sender, CharacteristicUpdatedEventArgs e)
         {
             var value = e.Characteristic.Value[0];
             HeartService._heartValues.Add(value);
+            HeartService._heartIncrement++;
         }
 
         private void bleScan(object sender, EventArgs e)
@@ -140,12 +152,13 @@ namespace AndroidMobile
         private void _bleAdapter_DeviceDiscovered(object sender, DeviceEventArgs e)
         {
             _currDevice = e.Device;
-
-            Toast.MakeText(this, _currDevice.Name + " - discovered!", ToastLength.Long).Show();
             BluetoothDevice dev = _currDevice.NativeDevice as BluetoothDevice;
 
             if (dev.Address == StaticValues.DeviceAddress)
+            {
+                Toast.MakeText(this, _currDevice.Name + " - discovered!", ToastLength.Short).Show();
                 ConnectToPMDDeviceAsync();
+            }
         }
 
         public async void StopScanningForDevice()
@@ -170,6 +183,9 @@ namespace AndroidMobile
 
                     StopScanningForDevice();
                     Toast.MakeText(this, "Connected to " + _currDevice.Name + "!", ToastLength.Short).Show();
+
+                    Button transmitButton = FindViewById<Button>(Resource.Id.trasmitData);
+                    transmitButton.Enabled = true;
                 }
                 catch (DeviceConnectionException er)
                 {

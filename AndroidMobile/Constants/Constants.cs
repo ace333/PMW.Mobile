@@ -15,12 +15,13 @@ namespace AndroidMobile.Constants
     public static class StaticValues
     {
         public static int MaxValue = 5;
+        public static int ClearValue = 1000;
         public static string DeviceAddress = "EE:8D:AD:5B:2B:E3";
     }
 
     public static class APIConstant
     {
-        public static string ApiAddress = "";
+        public static string ApiAddress = "http://pmw.arres.pl";
         public static string HeartRateAddress = "HeartRate";
         public static string AcceleroAddress = "Accelero";
     }

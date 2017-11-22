@@ -20,6 +20,10 @@ namespace AndroidMobile.Services
     public class HeartService : Service
     {
         public static List<int> _heartValues;
+        public static int _heartIncrement;
+
+        private static int _actualLength;
+
         private bool _isStarted;
         
         Timer _timer;
@@ -30,22 +34,23 @@ namespace AndroidMobile.Services
             _heartValues = new List<int>();
         }
 
-        private async void SendValues(int[] values)
-        {
-            bool result = await JSONApiHelper.DoPostRequestAsync(APIConstant.HeartRateAddress, values);
-            Log.Debug("ACCELERO POST REQUEST : ", result.ToString());
-        }
 
         private void _heartValueUpdating(object state)
         {
-            if(_heartValues.Count >= StaticValues.MaxValue)
+            if(_heartIncrement >= StaticValues.MaxValue)
             {
-                var array = _heartValues.GetRange(0, StaticValues.MaxValue).ToArray();
-
-                SendValues(array);
+                var array = _heartValues.GetRange(_actualLength, StaticValues.MaxValue).ToArray();
 
                 Log.Debug("HEART DEBUG : ", array.Length.ToString());
-                _heartValues.RemoveRange(0, StaticValues.MaxValue);
+
+                if(_actualLength == StaticValues.ClearValue)
+                    _heartValues.RemoveRange(0, StaticValues.ClearValue);
+
+                _heartIncrement = 0;
+
+                _actualLength += StaticValues.MaxValue;
+
+                JSONApiHelper.DoPostRequestAsync(APIConstant.HeartRateAddress, array);
             }
         }
 

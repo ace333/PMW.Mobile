@@ -17,12 +17,20 @@
         android:textAlignment="center"
         android:id="@+id/infoText" />
     <Button
-        android:text="Connect To Device and Start Transmitting Data"
+        android:text="Connect To Device"
         android:layout_gravity="center_horizontal"
         android:layout_width="320.5dp"
         android:layout_height="91.5dp"
         android:id="@+id/scanButton"
         android:layout_marginTop="30dp"
+        android:layout_marginBottom="5dp" />
+    <Button
+        android:text="Start Transmitting Data"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="320.5dp"
+        android:layout_height="91.5dp"
+        android:id="@+id/trasmitData"
+        android:layout_marginTop="15dp"
         android:layout_marginBottom="5dp" />
     <TextView
         android:text="Is Connected ?"
